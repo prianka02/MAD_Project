@@ -1,15 +1,32 @@
 import { React, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import FormInput from "../components/FormInput";
-import SocialButton from "../components/SocialButton";
-import { windowHeight, windowWidth } from "../utils/Dimensions";
 import FormButton from "../components/FormButton";
+import { useNavigation } from "@react-navigation/native";
+import { firebase } from '../config';
 
 
 
 const LoginScreen = ({ navigation }) => {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    loginUser = async (email, password) => {
+        try {
+            await firebase.auth().signInWithEmailAndPassword(email, password);
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    const forgetPassword = () => {
+        firebase.auth().sendPasswordResetEmail(email).then(() => {
+            alert("Password reset email sent")
+        }).catch((error) => {
+            alert(error)
+        })
+    }
+
     return (
         <View style={styles.container}>
             <Image
@@ -33,11 +50,13 @@ const LoginScreen = ({ navigation }) => {
                 secureTextEntry={true} />
             <FormButton
                 buttonTitle="Sign In"
-                onPress={() => alert('Sign In Clicked!')}
+                onPress={() => loginUser(email, password)}
             />
 
 
-            <TouchableOpacity style={styles.forgotButton} onPress={() => { }}>
+            <TouchableOpacity style={styles.forgotButton} onPress={() => {
+                forgetPassword()
+            }}>
                 <Text style={styles.navButtonText}>Forgot Password</Text>
             </TouchableOpacity>
 
